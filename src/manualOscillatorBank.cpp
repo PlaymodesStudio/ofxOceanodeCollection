@@ -8,10 +8,10 @@
 
 #include "manualOscillatorBank.h"
 
-manualOscillatorBank::manualOscillatorBank() : baseIndexer(100, "Manual Oscillator Bank"){
+void manualOscillatorBank::setup(){
     
     addParameter(phasorIn.set("Phase", 0, 0, 1));
-    putParametersInParametersGroup();
+    addParameter(indexs.set("Index", {0}, {0}, {1}));
     addParameter(manualInput.set("Input", 0, 0, 1));
     addParameter(damping.set("Damp.", 0, 0, 1));
     addParameter(dampingPow.set("Damp.Pow", 0, -40, 40));
@@ -26,12 +26,6 @@ manualOscillatorBank::manualOscillatorBank() : baseIndexer(100, "Manual Oscillat
     color = ofColor(0, 128, 255);
 }
 
-void manualOscillatorBank::presetRecallBeforeSettingParameters(ofJson &json){
-    if(json.count("Size") == 1){
-        getParameterGroup().getInt("Size") = ofToInt(json["Size"]);
-    }
-}
-
 
 void manualOscillatorBank::computeValues(float &f){
     if(oldPhasor > f) bufferOverflow++;
@@ -40,11 +34,11 @@ void manualOscillatorBank::computeValues(float &f){
     indexedBuffer.push_front(make_pair(f+bufferOverflow, manualInput));
     
     vector<float>   tempOut;
-    tempOut.resize(indexs.size(), 0);
+    tempOut.resize(indexs->size(), 0);
     
     int minBufferOverflow = 1000;
-    for(int i = 0; i < indexs.size(); i++){
-        float newBuffIndex = f+bufferOverflow - float(indexs[i]);
+    for(int i = 0; i < indexs->size(); i++){
+        float newBuffIndex = f+bufferOverflow - float(1.0f-indexs->at(i));
         for(int j = 1; j < indexedBuffer.size(); j++){
             if(signbit(indexedBuffer[j-1].first - newBuffIndex) != signbit(indexedBuffer[j].first - newBuffIndex)){
                 //Average tempOut[i] = (indexedBuffer[j-1].second + indexedBuffer[j].second)*0.5;
@@ -57,9 +51,9 @@ void manualOscillatorBank::computeValues(float &f){
                     
                 //Damping
                 if(dampingPow < 0){
-                    tempOut[i] *= pow((1-(indexs[i]*damping)), 1/(float)(-dampingPow + 1));
+                    tempOut[i] *= pow((1-(indexs->at(i)*damping)), 1/(float)(-dampingPow + 1));
                 }else{
-                    tempOut[i] *= pow((1-(indexs[i]*damping)), (dampingPow + 1));
+                    tempOut[i] *= pow((1-(indexs->at(i)*damping)), (dampingPow + 1));
                 }
                 j = indexedBuffer.size();
             }

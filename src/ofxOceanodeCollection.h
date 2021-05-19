@@ -25,6 +25,7 @@
 #include "vectorModulator.h"
 #include "vectorOperations.h"
 #include "vectorPresetEaser.h"
+#include "manualVector.h"
 
 
 #include "ofxOceanode.h"
@@ -39,7 +40,7 @@ static void registerModels(ofxOceanode &o){
     o.registerModel<sequentialAnalyzer>("Collection");
     o.registerModel<stepSequencer>("Collection");
     o.registerModel<subDimensionCombinator>("Collection");
-    o.registerModel<thresholdBang>("Collection");
+    o.registerModel<threshold>("Collection");
     o.registerModel<valueEaser>("Collection");
     o.registerModel<vectorChain>("Collection");
     o.registerModel<vectorGetter>("Collection");
@@ -47,6 +48,7 @@ static void registerModels(ofxOceanode &o){
     o.registerModel<vectorModulator>("Collection");
     o.registerModel<vectorOperations>("Collection");
     o.registerModel<vectorPresetEaser>("Collection");
+    o.registerModel<manualVector>("Collection");
 }
 }
 

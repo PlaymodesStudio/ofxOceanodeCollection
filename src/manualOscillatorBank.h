@@ -9,15 +9,15 @@
 #ifndef manualOscillatorBank_h
 #define manualOscillatorBank_h
 
-#include "baseIndexer.h"
+#include "ofxOceanodeNodeModel.h"
 
-class manualOscillatorBank: public baseIndexer{
+class manualOscillatorBank: public ofxOceanodeNodeModel{
 public:
-    manualOscillatorBank();
+    manualOscillatorBank() : ofxOceanodeNodeModel("Manual Oscillator Bank"){};
     ~manualOscillatorBank(){};
     
-    void presetRecallBeforeSettingParameters(ofJson &json) override;
-    
+    void setup();
+        
     void presetHasLoaded() override{
         output = {0};
     }
@@ -33,6 +33,7 @@ private:
     int bufferOverflow;
     float               bufferIndex;
     ofParameter<float>  phasorIn;
+    ofParameter<vector<float>>  indexs;
     float               oldPhasor;
     ofParameter<float>  damping;
     ofParameter<float>  dampingPow;
