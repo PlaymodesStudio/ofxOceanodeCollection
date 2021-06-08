@@ -14,64 +14,19 @@ public:
     ~stepSequencer(){};
     
     void setup(){
-        addParameter(numSteps.set("N.Steps", 1, 1, 100));
         addParameter(index.set("Index", 0, 0, 1));
-        lastNumSteps = 0;
-        
-        addParameter(output.set("Output", {0}, {0}, {1}));
         addParameter(stepsVec.set("Steps[]", {0}, {0}, {1}));
+        addParameter(output.set("Output", {0}, {0}, {1}));
         
-        numStepsListener = numSteps.newListener([this](int &nsteps){
-            if(lastNumSteps == nsteps) return;
-            else if(lastNumSteps > nsteps){
-                for(int i = nsteps ; i < lastNumSteps; i++){
-                    getParameterGroup().remove(steps[i]);
-                    sliderListeners.unsubscribe(i);
-                }
-                steps.resize(nsteps);
-                vector<float> tempSteps = stepsVec;
-                tempSteps.resize(nsteps);
-                stepsVec = tempSteps;
-            }else{
-                steps.resize(nsteps);
-                vector<float> tempSteps = stepsVec;
-                tempSteps.resize(nsteps);
-                stepsVec = tempSteps;
-                
-//                parameters->remove(output);
-//                parameters->remove(stepsVec);
-                
-                for(int i = lastNumSteps; i < numSteps; i++){
-                    addParameter(steps[i].set("Step " + ofToString(i), 0, 0, 1));
-                    sliderListeners.push(steps[i].newListener([this, i](float &f){
-                        vector<float> tempOutput = stepsVec;
-                        tempOutput[i] = f;
-                        stepsVec = tempOutput;
-                        if(index == i) index = i;
-                    }));
-                    steps[i] = 0;
-                }
-                
-//                parameterGroupChanged.notify();
-//
-//                addParameterToGroupAndInfo(output);
-//                addParameterToGroupAndInfo(stepsVec);
-            }
-            parameterGroupChanged.notify();
-            
-            string parameterName = index.getName();
-            index.setMax(numSteps-1);
-            index.set(0);
-            parameterChangedMinMax.notify(parameterName);
-            
-            lastNumSteps = nsteps;
-        });
-        numSteps = 4;
-        
-        
+		stepsVecListener = stepsVec.newListener([this](vector<float> &steps){
+			index.setMax(steps.size()-1);
+			stepsVec.setMax(vector<float>(1, *std::max_element(steps.begin(), steps.end())));
+			output.setMax(stepsVec.getMax());
+		});
+		
         indexListener = index.newListener([this](int &ind){
-            ind %= numSteps;
-            vector<float> tempOut(numSteps, 0);
+            ind %= stepsVec->size();
+            vector<float> tempOut(stepsVec->size(), 0);
             tempOut[ind] = stepsVec.get()[ind];
             output = tempOut;
         });
@@ -81,27 +36,23 @@ public:
     }
     
     void presetHasLoaded(){
-        vector<float> tempOut(numSteps, 0);
-        for(int i = 0 ; i < numSteps; i++){
-            tempOut[i] = steps[i];
-        }
-        stepsVec = tempOut;
-        tempOut = vector<float>(numSteps, 0);
-        tempOut[index] = steps[index];
-        output = tempOut;
+//        vector<float> tempOut(numSteps, 0);
+//        for(int i = 0 ; i < numSteps; i++){
+//            tempOut[i] = steps[i];
+//        }
+//        stepsVec = tempOut;
+//        tempOut = vector<float>(numSteps, 0);
+//        tempOut[index] = steps[index];
+//        output = tempOut;
     }
     
 private:
     ofParameter<int> index;
-    ofParameter<int> numSteps;
-    vector<ofParameter<float>> steps;
     ofParameter<vector<float>> output;
     ofParameter<vector<float>> stepsVec;
     
-    int lastNumSteps;
-    ofEventListener numStepsListener;
+	ofEventListener stepsVecListener;
     ofEventListener indexListener;
-    ofEventListeners sliderListeners;
 };
 
 #endif /* stepSequencer_h */
