@@ -9,10 +9,10 @@
 
 vectorItemOperations::vectorItemOperations() : ofxOceanodeNodeModel("Vector Item Operations"){
     addParameter(triggerIndex.set("Trig.In", 0, 0, 1));
-    addParameter(in1.set("Input.1", {0}, {0}, {1}));
-    addParameter(in2.set("Input.2", {0}, {0}, {1}));
-    addParameterDropdown(operation, "Op.", 0, {"Bypass", "Sum", "Multiply", "Mean", "Diff", "Max", "Min"});
-    addParameter(output.set("Output", {0}, {0}, {1}));
+    addParameter(in1.set("Input.1", {0}, {-FLT_MAX}, {FLT_MAX}));
+    addParameter(in2.set("Input.2", {0}, {-FLT_MAX}, {FLT_MAX}));
+	addParameterDropdown(operation, "Op.", 0, {"Bypass", "Sum", "Multiply", "Mean", "Diff", "Max", "Min", "Modulo", "Div", "Subs", "Exp", "Log"});
+	addParameter(output.set("Output", {0}, {FLT_MIN}, {FLT_MAX}));
     
 
     
@@ -29,9 +29,19 @@ vectorItemOperations::vectorItemOperations() : ofxOceanodeNodeModel("Vector Item
 }
 
 void vectorItemOperations::computeOutput(vector<float> &in){
-    if(in1.get().size() == in2.get().size()){
+	auto getValueForIndex = [](const vector<float> &vf, int i) ->float {
+        if(i < vf.size()){
+            return vf[i];
+        }else{
+            return vf[0];
+        }
+	};
+	
+	
+	int maxSize = std::max(in1->size(), in2->size());
+    if(maxSize > 0){
         vector<float> tempOut;
-        tempOut.resize(in1.get().size(), 0);
+        tempOut.resize(maxSize, 0);
         switch(operation){
             case 0:
             {
@@ -45,45 +55,80 @@ void vectorItemOperations::computeOutput(vector<float> &in){
             case 1:
             {
                 for(int i = 0; i < tempOut.size(); i++){
-                    tempOut[i] = ofClamp(in1.get()[i] + in2.get()[i], 0, 1);
+                    tempOut[i] = (getValueForIndex(in1, i) + getValueForIndex(in2, i));
                 }
                 break;
             }
             case 2:
             {
                 for(int i = 0; i < tempOut.size(); i++){
-                    tempOut[i] = ofClamp(in1.get()[i] * in2.get()[i], 0, 1);
+                    tempOut[i] = (getValueForIndex(in1, i) * getValueForIndex(in2, i));
                 }
                 break;
             }
             case 3:
             {
                 for(int i = 0; i < tempOut.size(); i++){
-                    tempOut[i] = ofClamp((in1.get()[i] + in2.get()[i]) / 2, 0, 1);
+                    tempOut[i] = ((getValueForIndex(in1, i) + getValueForIndex(in2, i)) / 2);
                 }
                 break;
             }
             case 4:
             {
                 for(int i = 0; i < tempOut.size(); i++){
-                    tempOut[i] = ofClamp(abs(in1.get()[i] - in2.get()[i]), 0, 1);
+                    tempOut[i] = abs(getValueForIndex(in1, i) - getValueForIndex(in2, i));
                 }
                 break;
             }
             case 5:
             {
                 for(int i = 0; i < tempOut.size(); i++){
-                    tempOut[i] = max(in1.get()[i], in2.get()[i]);
+                    tempOut[i] = max(getValueForIndex(in1, i), getValueForIndex(in2, i));
                 }
                 break;
             }
             case 6:
             {
                 for(int i = 0; i < tempOut.size(); i++){
-                    tempOut[i] = min(in1.get()[i], in2.get()[i]);
+                    tempOut[i] = min(getValueForIndex(in1, i), getValueForIndex(in2, i));
                 }
                 break;
             }
+			case 7: //Modulo
+			{
+				for(int i = 0; i < tempOut.size(); i++){
+					tempOut[i] = fmod(getValueForIndex(in1, i), getValueForIndex(in2, i));
+				}
+				break;
+			}
+			case 8: //Div
+			{
+				for(int i = 0; i < tempOut.size(); i++){
+					tempOut[i] = (getValueForIndex(in1, i) / getValueForIndex(in2, i));
+				}
+				break;
+			}
+			case 9: //Subs
+			{
+				for(int i = 0; i < tempOut.size(); i++){
+					tempOut[i] = (getValueForIndex(in1, i) - getValueForIndex(in2, i));
+				}
+				break;
+			}
+			case 10: //Exp
+			{
+				for(int i = 0; i < tempOut.size(); i++){
+					tempOut[i] = pow(getValueForIndex(in1, i), getValueForIndex(in2, i));
+				}
+				break;
+			}
+			case 11: //Log
+			{
+				for(int i = 0; i < tempOut.size(); i++){
+					tempOut[i] = log(getValueForIndex(in1, i) / log(getValueForIndex(in2, i)));
+				}
+				break;
+			}
             default:
             {
                 tempOut = in1;
