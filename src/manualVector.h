@@ -176,6 +176,10 @@ public:
             vectorValue = json["Value"].get<vector<float>>();
         }
     };
+
+	void presetHasLoaded() override {
+		vectorValueParam = vectorValue;
+	};
     
 private:
     ofEventListeners listeners;
