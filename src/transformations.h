@@ -16,7 +16,7 @@ public:
 	
 	void setup(){
 		addParameter(input.set("Input", {0}, {-FLT_MAX}, {FLT_MAX}));
-		addParameterDropdown(transformation, "Trans", 0, {"Bypass", "Invert", "Reciprocal", "Neg", "Abs"});
+		addParameterDropdown(transformation, "Trans", 0, {"Bypass", "Invert", "Reciprocal", "Neg", "Abs", "Floor", "Round", "Ceil"});
 		addParameter(output.set("Output", {0}, {-FLT_MAX}, {FLT_MAX}));
 		
 		listener = input.newListener([this](vector<float> &vf){
@@ -41,6 +41,15 @@ public:
 					case 4:
 						return abs(f);
 						break;
+                    case 5:
+                        return floor(f);
+                        break;
+                    case 6:
+                        return round(f);
+                        break;
+                    case 7:
+                        return ceil(f);
+                        break;
 					default:
 						break;
 				}
