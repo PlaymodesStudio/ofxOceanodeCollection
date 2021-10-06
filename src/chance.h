@@ -64,18 +64,26 @@ public:
             setSeed();
         }));
     }
+	
+	void resetPhase(){
+		setSeed();
+	}
     
 private:
     
     void setSeed(){
         for(int i = 0; i < mt.size(); i++){
-            int s = seed->size() == mt.size() ? seed->at(i) : seed->at(0);
-            if(s == 0){
-                std::random_device rd;
-                mt[i].seed(rd());
-            }else{
-                mt[i].seed(s);
-            }
+			if(seed->size() == mt.size()){
+				mt[i].seed(seed->at(i));
+			}
+			else{
+				if(seed->at(0) == 0){
+					std::random_device rd;
+					mt[i].seed(rd());
+				}else{
+					mt[i].seed(seed->at(0) + i);
+				}
+			}
         }
     }
     
