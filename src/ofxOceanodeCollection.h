@@ -30,6 +30,7 @@
 #include "markovChain.h"
 #include "transformations.h"
 #include "statistics.h"
+#include "vectorResize.h"
 
 
 #include "ofxOceanode.h"
@@ -57,6 +58,7 @@ static void registerModels(ofxOceanode &o){
     o.registerModel<markovChain>("Collection");
 	o.registerModel<transformations>("Collection");
 	o.registerModel<statistics>("Collection");
+	o.registerModel<vectorResize>("Collection");
 }
 }
 
