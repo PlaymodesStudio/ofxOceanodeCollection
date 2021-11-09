@@ -55,6 +55,14 @@ public:
         }));
     }
     
+    void resetPhase() override{
+        currentPosition = 0;
+        floatOutput = (float)currentPosition/(float)outputSize;
+        vector<float> tempPulseOutput(outputSize, 0);
+        tempPulseOutput[currentPosition] = 1;
+        pulseOutput = tempPulseOutput;
+    }
+    
 private:
     ofParameter<vector<float>> input;
     ofParameter<float> threshold;
