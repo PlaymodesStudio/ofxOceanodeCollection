@@ -16,6 +16,7 @@ public:
     vectorResize() : ofxOceanodeNodeModel("Vector Resize"){
         addParameter(input.set("Input", {0}, {0}, {1}));
         addParameter(size.set("Size", 1, 1, INT_MAX));
+        addParameter(resample.set("Resample", true));
 		addParameterDropdown(interp, "Interp", 0, {"None", "Avg", "Min", "Max"});
 		addOutputParameter(output.set("Output", {0}, {0}, {1}));
         
@@ -25,6 +26,11 @@ public:
 private:
     void inputListener(vector<float> &v){
         if(v.size() > 0){
+            if(!resample){
+                vector<float> tempOut = v;
+                tempOut.resize(size, 0);
+                output = tempOut;
+            }else{
 			if(v.size() == size){
 				output = v;
 			}else if(v.size() < size){
@@ -77,6 +83,7 @@ private:
 				}
 				output = tempOut;
 			}
+            }
         }
     }
     
@@ -84,6 +91,7 @@ private:
     
     ofParameter<vector<float>>  input;
     ofParameter<int> size;
+    ofParameter<bool> resample;
 	ofParameter<int> interp;
     ofParameter<vector<float>>  output;
 };
