@@ -12,8 +12,8 @@
 
 euclideanGenerator::euclideanGenerator() : ofxOceanodeNodeModel("Euclidean Generator"){
     addParameter(input.set("Input", 0, 0, 1));
-    addParameter(onsets.set("Onsets", 1, 1, 32));
-    addParameter(divisions.set("Divs", 1, 1, 32));
+    addParameter(onsets.set("Onsets", 1, 1, 1));
+    addParameter(divisions.set("Divs", 1, 1, INT_MAX));
     addParameter(offset.set("Offset", 0, 0, 1));
     addParameter(output.set("Output", {0}, {0}, {1}));
     addParameter(outputBool.set("Out.Bool", false));
@@ -22,6 +22,12 @@ euclideanGenerator::euclideanGenerator() : ofxOceanodeNodeModel("Euclidean Gener
     listeners.push(input.newListener(this, &euclideanGenerator::computeOutput));
     listeners.push(onsets.newListener(this, &euclideanGenerator::computeAlgorithm));
     listeners.push(divisions.newListener(this, &euclideanGenerator::computeAlgorithm));
+    
+    listeners.push(offset.newListener([this](int &i){
+        vector<float> tempOutSteps(sequence.size(), 0);
+        for(int i = 0; i < sequence.size(); i++) tempOutSteps[(i+offset)%sequence.size()] = sequence[i];
+        outputSteps = tempOutSteps;
+    }));
     int i = 0;
     computeAlgorithm(i);
 }
@@ -50,6 +56,10 @@ void euclideanGenerator::computeAlgorithm(int &i){
         offset.setMax(divisions);
         offset.set(0);
         parameterChangedMinMax.notify(this, offsetName);
+    }
+    if(onsets.getMax() != divisions){
+        onsets.setMax(divisions);
+        if(onsets > divisions) onsets = divisions;
     }
     if(outputIndex.getMax() != onsets-1){
         string outputindexName = outputIndex.getName();
@@ -80,7 +90,7 @@ void euclideanGenerator::computeAlgorithm(int &i){
 //        cout<<endl;
     }
     vector<float> tempOutSteps(sequence.size(), 0);
-    for(int i = 0; i < sequence.size(); i++) tempOutSteps[i] = sequence[i];
+    for(int i = 0; i < sequence.size(); i++) tempOutSteps[(i+offset)%sequence.size()] = sequence[i];
     outputSteps = tempOutSteps;
 }
 
@@ -100,7 +110,7 @@ vector<vector<bool>> euclideanGenerator::moveZeros(vector<vector<bool>> in){
     }else{
         vector<bool> lastMovedSequence = in.back();
         int i = 0;
-        while(lastMovedSequence == in.back() && in[i] != vector<bool>(1, false)){
+        while(lastMovedSequence == in.back() && in[i] != vector<bool>(1, false) && &in[i] != &in.back()){
             lastMovedSequence = in.back();
             in[i].insert(in[i].end(), lastMovedSequence.begin(), lastMovedSequence.end());
             in.pop_back();
