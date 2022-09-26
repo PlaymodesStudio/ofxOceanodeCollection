@@ -13,16 +13,24 @@
 
 class vectorChain : public ofxOceanodeNodeModel{
 public:
-    vectorChain();
+    vectorChain() : ofxOceanodeNodeModel("Vector Chain"){};
     ~vectorChain(){};
+    
+    void setup();
+    
+    void loadBeforeConnections(ofJson &json){
+        deserializeParameter(json, numInputs);
+    }
     
 private:
     void inputListener(vector<float> &v);
     
-    ofEventListener listener;
+    ofEventListeners listeners;
     vector<ofParameter<vector<float>>>  inputs;
     ofParameter<float>  offset;
     ofParameter<vector<float>>  output;
+    ofParameter<bool> interleave;
+    ofParameter<int> numInputs;
 };
 
 #endif /* vectorChain_h */
