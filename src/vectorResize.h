@@ -23,6 +23,10 @@ public:
         listener = input.newListener(this, &vectorResize::inputListener);
     };
     
+    void loadBeforeConnections(ofJson &json){
+        deserializeParameter(json, size);
+    }
+    
 private:
     void inputListener(vector<float> &v){
         if(v.size() > 0){
