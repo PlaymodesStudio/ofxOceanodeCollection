@@ -8,7 +8,7 @@
 #include "vectorItemOperations.h"
 
 vectorItemOperations::vectorItemOperations() : ofxOceanodeNodeModel("Vector Item Operations"){
-    addParameter(triggerIndex.set("Trig.In", 0, 0, 1));
+    addParameter(triggerIndex.set("Trig.In", 0, 0, 2));
     addParameter(in1.set("Input.1", {0}, {-FLT_MAX}, {FLT_MAX}));
     addParameter(in2.set("Input.2", {0}, {-FLT_MAX}, {FLT_MAX}));
 	addParameterDropdown(operation, "Op.", 0, {"Bypass", "Sum", "Multiply", "Mean", "Diff", "Max", "Min", "Modulo", "Div", "Subs", "Exp", "Log"});
@@ -17,12 +17,12 @@ vectorItemOperations::vectorItemOperations() : ofxOceanodeNodeModel("Vector Item
 
     
     listeners.push(in1.newListener([this](vector<float> &in){
-        if(triggerIndex == 0){
+        if(triggerIndex == 0 || triggerIndex == 2){
             computeOutput(in);
         }
     }));
     listeners.push(in2.newListener([this](vector<float> &in){
-        if(triggerIndex == 1){
+        if(triggerIndex == 1 || triggerIndex == 2){
             computeOutput(in);
         }
     }));
@@ -45,11 +45,11 @@ void vectorItemOperations::computeOutput(vector<float> &in){
         switch(operation){
             case 0:
             {
-                if(triggerIndex == 0){
-                    tempOut = in1;
-                }else{
-                    tempOut = in2;
-                }
+//                if(triggerIndex == 0){
+                    tempOut = in;
+//                }else{
+//                    tempOut = in;
+//                }
                 break;
             }
             case 1:
