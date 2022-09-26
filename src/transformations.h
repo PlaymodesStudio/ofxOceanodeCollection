@@ -24,7 +24,7 @@ public:
 			std::transform(tempOut.begin(),
 						   tempOut.end(),
 						   tempOut.begin(),
-						   [this](auto& f){
+						   [this](float& f){
 				switch (transformation) {
 					case 0:
 						return f;
@@ -51,6 +51,7 @@ public:
                         return ceil(f);
                         break;
 					default:
+                        return f;
 						break;
 				}
 			});
