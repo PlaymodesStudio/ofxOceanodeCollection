@@ -14,6 +14,8 @@ valueEaser::valueEaser() : ofxOceanodeNodeModel("Value Easer"){
     addParameter(bipow.set("BiPow", {0}, {-1}, {1}));
     addParameter(output.set("Output", {0}, {-FLT_MAX}, {FLT_MAX}));
     
+    addInspectorParameter(shortestPath.set("Shortest Path", false));
+    
     color = ofColor::green;
     
     listener = phasor.newListener([this](vector<float> &vf){
@@ -49,7 +51,15 @@ valueEaser::valueEaser() : ofxOceanodeNodeModel("Value Easer"){
                 if(phase < lastPhase[i]) reachedMax[i] = true;
                 else lastPhase[i] = phase;
                 if(!reachedMax[i]){
-                    tempOutput[i] = smoothinterpolate(lastChangedValue[i], input.get()[i], phase);
+                    if(shortestPath && abs(lastChangedValue[i] - input.get()[i]) > 0.5){
+                        if(lastChangedValue[i] > input.get()[i]){
+                            tempOutput[i] = fmod(smoothinterpolate(lastChangedValue[i], input.get()[i]+1, phase), 1);
+                        }else{
+                            tempOutput[i] = fmod(smoothinterpolate(lastChangedValue[i]+1, input.get()[i], phase), 1);
+                        }
+                    }else{
+                        tempOutput[i] = smoothinterpolate(lastChangedValue[i], input.get()[i], phase);
+                    }
                 }else{
                     tempOutput[i] = input.get()[i];
                 }
