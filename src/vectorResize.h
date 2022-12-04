@@ -20,6 +20,8 @@ public:
 		addParameterDropdown(interp, "Interp", 0, {"None", "Avg", "Min", "Max"});
 		addOutputParameter(output.set("Output", {0}, {0}, {1}));
         
+        addInspectorParameter(fill.set("Fill", false));
+        
         listener = input.newListener(this, &vectorResize::inputListener);
     };
     
@@ -32,7 +34,13 @@ private:
         if(v.size() > 0){
             if(!resample){
                 vector<float> tempOut = v;
+                if(fill && size > v.size()){
+                    while(tempOut.size() < size){
+                        tempOut.insert(tempOut.end(), v.begin(), v.end());
+                    }
+                }
                 tempOut.resize(size, 0);
+                
                 output = tempOut;
             }else{
 			if(v.size() == size){
@@ -96,6 +104,7 @@ private:
     ofParameter<vector<float>>  input;
     ofParameter<int> size;
     ofParameter<bool> resample;
+    ofParameter<bool> fill;
 	ofParameter<int> interp;
     ofParameter<vector<float>>  output;
 };
