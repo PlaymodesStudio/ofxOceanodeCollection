@@ -17,15 +17,16 @@ enum operations{
     SUM_OP = 3,
     MEAN_OP = 4,
     DIFF_OP = 5,
-    DEV_OP = 6
+    DEV_OP = 6,
+    SIZE_OP = 7
 };
 
 class vectorOperations : public ofxOceanodeNodeModel{
 public:
     vectorOperations() : ofxOceanodeNodeModel("Vector Operations"){
-        addParameter(input.set("Input", {0}, {0}, {1}));
-        addParameterDropdown(operationSelector, "Op.", 0, {"Min", "Max", "Sum", "Mean", "Diff", "Dev"});
-        addParameter(output.set("Output", 0, 0, 1));
+        addParameter(input.set("Input", {0}, {-FLT_MAX}, {FLT_MAX}));
+        addParameterDropdown(operationSelector, "Op.", 0, {"Min", "Max", "Sum", "Mean", "Diff", "Dev", "Size"});
+        addParameter(output.set("Output", 0, -FLT_MAX, FLT_MAX));
 
         listener = input.newListener(this, &vectorOperations::inputListener);
     }
@@ -91,6 +92,9 @@ private:
                 output = dev;
                 break;
             }
+            case SIZE_OP:
+                output = vf.size();
+                break;
             default:
                 break;
         }
