@@ -168,9 +168,6 @@ public:
                         ImGui::CloseCurrentPopup();
                     ImGui::EndPopup();
                 }
-                
-                vectorValueParam = vectorValue;
-                
             }
             
         });
@@ -195,6 +192,10 @@ public:
             vectorValueParam.setMax(vector<float>(1, f));
             vectorValueParam = vectorValue;
         }));
+    }
+    
+    void update(ofEventArgs &a){
+        vectorValueParam = vectorValue;
     }
     
     void presetSave(ofJson &json){
