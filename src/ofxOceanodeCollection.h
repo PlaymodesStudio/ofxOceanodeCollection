@@ -31,6 +31,10 @@
 #include "transformations.h"
 #include "statistics.h"
 #include "vectorResize.h"
+#include "vectorSelector.h"
+#include "vectorReorder.h"
+#include "vectorDistributor.h"
+#include "vectorRotator.h"
 
 
 #include "ofxOceanode.h"
@@ -59,6 +63,10 @@ static void registerModels(ofxOceanode &o){
 	o.registerModel<transformations>("Collection");
 	o.registerModel<statistics>("Collection");
 	o.registerModel<vectorResize>("Collection");
+    o.registerModel<vectorSelector>("Collection");
+    o.registerModel<vectorReorder>("Collection");
+    o.registerModel<vectorDistributor>("Collection");
+    o.registerModel<vectorRotator>("Collection");
 }
 }
 
