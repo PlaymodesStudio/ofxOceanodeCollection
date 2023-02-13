@@ -12,8 +12,8 @@ void statistics::setup(){
 	addParameter(size.set("Size", 2, 2, INT_MAX));
 	addParameter(weights.set("Weights", {0}, {0}, {1}));
     addParameter(input.set("Input", {0}, {0}, {1}));
-    addParameter(variance.set("Variance", {0}, {0}, {1}));
-	addParameter(mean.set("Mean", {0}, {0}, {1}));
+    addOutputParameter(variance.set("Variance", {0}, {0}, {1}));
+    addOutputParameter(mean.set("Mean", {0}, {0}, {1}));
     color = ofColor::green;
 }
 

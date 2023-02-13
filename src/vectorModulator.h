@@ -19,7 +19,7 @@ public:
         addParameter(source.set("Source", {0}, {0}, {1}));
         addParameter(modulator.set("Modulator", {0.5}, {0}, {1}));
         addParameter(amount.set("Amount", {0}, {0}, {1}));
-        addParameter(output.set("Output", {0}, {0}, {1}));
+        addOutputParameter(output.set("Output", {0}, {0}, {1}));
         
         listeners.push(source.newListener(this, &vectorModulator::computeOutput));
         listeners.push(modulator.newListener(this, &vectorModulator::computeOutput));

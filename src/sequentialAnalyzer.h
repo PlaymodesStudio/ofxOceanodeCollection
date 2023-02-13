@@ -19,8 +19,8 @@ public:
         addParameter(input.set("Input", {0}, {0}, {1}));
         addParameter(threshold.set("Threshold", {0.5}, {0}, {1}));
         addParameter(outputSize.set("Out.Size", 1, 1, 1000));
-        addParameter(floatOutput.set("Output", 0, 0, 1));
-        addParameter(pulseOutput.set("Pulse", {0}, {0}, {1}));
+        addOutputParameter(floatOutput.set("Output", 0, 0, 1));
+        addOutputParameter(pulseOutput.set("Pulse", {0}, {0}, {1}));
         
         currentPosition = 0;
         

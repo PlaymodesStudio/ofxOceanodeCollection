@@ -12,7 +12,7 @@ vectorItemOperations::vectorItemOperations() : ofxOceanodeNodeModel("Vector Item
     addParameter(in1.set("Input.1", {0}, {-FLT_MAX}, {FLT_MAX}));
     addParameter(in2.set("Input.2", {0}, {-FLT_MAX}, {FLT_MAX}));
 	addParameterDropdown(operation, "Op.", 0, {"Bypass", "Sum", "Multiply", "Mean", "Diff", "Max", "Min", "Modulo", "Div", "Subs", "Exp", "Log"});
-	addParameter(output.set("Output", {0}, {FLT_MIN}, {FLT_MAX}));
+	addOutputParameter(output.set("Output", {0}, {FLT_MIN}, {FLT_MAX}));
     
 
     

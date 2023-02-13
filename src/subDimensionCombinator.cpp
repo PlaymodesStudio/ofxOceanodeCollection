@@ -12,7 +12,7 @@ subDimensionCombinator::subDimensionCombinator() : ofxOceanodeNodeModel("SubDime
     addParameter(original.set("Original", {0}, {0}, {1}));
     addParameter(subDimension.set("Sub.Dim", {0}, {0}, {1}));
     
-    addParameter(output.set("Output", {0}, {0}, {1}));
+    addOutputParameter(output.set("Output", {0}, {0}, {1}));
     
     listener = original.newListener(this, &subDimensionCombinator::paramListener);
 }

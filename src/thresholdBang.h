@@ -17,7 +17,7 @@ public:
     void setup(){
         addParameter(input.set("Input", {0}, {0}, {1}));
         addParameter(thresholdVal.set("Thrs.", {1}, {0}, {1}));
-        addParameter(output.set("Change", {0}, {0}, {1}));
+        addOutputParameter(output.set("Change", {0}, {0}, {1}));
         addParameter(toggleOut.set("State", {0}, {0}, {1}));
 		
 		addInspectorParameter(frameMode.set("Frame", false));

@@ -15,7 +15,7 @@ void manualOscillatorBank::setup(){
     addParameter(manualInput.set("Input", 0, 0, 1));
     addParameter(damping.set("Damp.", 0, 0, 1));
     addParameter(dampingPow.set("Damp.Pow", 0, -40, 40));
-    addParameter(output.set("Output", {0}, {0}, {1}));
+    addOutputParameter(output.set("Output", {0}, {0}, {1}));
     
     phasorInEvent = phasorIn.newListener(this, &manualOscillatorBank::computeValues);
     

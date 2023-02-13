@@ -20,7 +20,7 @@ public:
         addParameter(seed.set("Seed", {0}, {(INT_MIN+1)/2}, {(INT_MAX-1)/2}));
         addParameter(probability.set("Prob", {0.5}, {0}, {1}));
         addParameter(retrigger.set("Retrig", false));
-        addParameter(output.set("Output", {0}, {0}, {1}));
+        addOutputParameter(output.set("Output", {0}, {0}, {1}));
         
         dist = std::uniform_real_distribution<float>(0.0, 1.0);
         oldPhasor.push_back(-1);

@@ -16,7 +16,7 @@ public:
     void setup(){
         addParameter(index.set("Index", 0, 0, 1));
         addParameter(stepsVec.set("Steps[]", {0}, {0}, {1}));
-        addParameter(output.set("Output", {0}, {0}, {1}));
+        addOutputParameter(output.set("Output", {0}, {0}, {1}));
         
 		stepsVecListener = stepsVec.newListener([this](vector<float> &steps){
 			index.setMax(steps.size()-1);

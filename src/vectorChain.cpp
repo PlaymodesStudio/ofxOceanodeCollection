@@ -13,11 +13,11 @@ void vectorChain::setup(){
     addInspectorParameter(numInputs.set("Inputs", 2, 2, INT_MAX));
     addInspectorParameter(interleave.set("Interleave", false));
     addParameter(offset.set("Offset", 0, -1, 1));
-    addParameter(output.set("Output", {0}, {0}, {1}));
+    addOutputParameter(output.set("Output", {0}, {-FLT_MAX}, {FLT_MAX}));
     
     inputs.resize(2);
     for(int i = 0; i < inputs.size() ; i++){
-        addParameter(inputs[i].set("Input " + ofToString(i), {0}, {0}, {1}));
+        addParameter(inputs[i].set("Input " + ofToString(i), {0}, {-FLT_MAX}, {FLT_MAX}));
     }
     
     
@@ -33,7 +33,7 @@ void vectorChain::setup(){
                 }
             }else{
                 for(int j = oldSize; j < i; j++){
-                    addParameter(inputs[j].set("Input " + ofToString(j), {0}, {0}, {1}));
+                    addParameter(inputs[j].set("Input " + ofToString(j), {0}, {-FLT_MAX}, {FLT_MAX}));
                 }
             }
         }

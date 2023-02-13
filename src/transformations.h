@@ -17,7 +17,7 @@ public:
 	void setup(){
 		addParameter(input.set("Input", {0}, {-FLT_MAX}, {FLT_MAX}));
 		addParameterDropdown(transformation, "Trans", 0, {"Bypass", "Invert", "Reciprocal", "Neg", "Abs", "Floor", "Round", "Ceil"});
-		addParameter(output.set("Output", {0}, {-FLT_MAX}, {FLT_MAX}));
+        addOutputParameter(output.set("Output", {0}, {-FLT_MAX}, {FLT_MAX}));
 		
 		listener = input.newListener([this](vector<float> &vf){
 			vector<float> tempOut = vf;

@@ -12,7 +12,7 @@ delta::delta() : ofxOceanodeNodeModel("Delta"){
     addParameter(gain.set("Gain", 1, 0, FLT_MAX));
     addParameter(invert.set("Invert", false));
     addParameter(input.set("Input", {0}, {0}, {1}));
-    addParameter(output.set("Output", {0}, {0}, {1}));
+    addOutputParameter(output.set("Output", {0}, {0}, {1}));
     addParameter(outputPositive.set("Output +", {0}, {0}, {1}));
     addParameter(outputNegative.set("Output -", {0}, {0}, {1}));
     

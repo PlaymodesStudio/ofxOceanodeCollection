@@ -15,10 +15,10 @@ euclideanGenerator::euclideanGenerator() : ofxOceanodeNodeModel("Euclidean Gener
     addParameter(onsets.set("Onsets", 1, 1, 1));
     addParameter(divisions.set("Divs", 1, 1, INT_MAX));
     addParameter(offset.set("Offset", 0, 0, 1));
-    addParameter(output.set("Output", {0}, {0}, {1}));
-    addParameter(outputBool.set("Out.Bool", false));
-    addParameter(outputSteps.set("Steps", {0}, {0}, {1}));
-    addParameter(outputIndex.set("Index", 0, 0, 1));
+    addOutputParameter(output.set("Output", {0}, {0}, {1}));
+    addOutputParameter(outputBool.set("Out.Bool", false));
+    addOutputParameter(outputSteps.set("Steps", {0}, {0}, {1}));
+    addOutputParameter(outputIndex.set("Index", 0, 0, 1));
     listeners.push(input.newListener(this, &euclideanGenerator::computeOutput));
     listeners.push(onsets.newListener(this, &euclideanGenerator::computeAlgorithm));
     listeners.push(divisions.newListener(this, &euclideanGenerator::computeAlgorithm));

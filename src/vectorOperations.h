@@ -26,7 +26,7 @@ public:
     vectorOperations() : ofxOceanodeNodeModel("Vector Operations"){
         addParameter(input.set("Input", {0}, {-FLT_MAX}, {FLT_MAX}));
         addParameterDropdown(operationSelector, "Op.", 0, {"Min", "Max", "Sum", "Mean", "Diff", "Dev", "Size"});
-        addParameter(output.set("Output", 0, -FLT_MAX, FLT_MAX));
+        addOutputParameter(output.set("Output", 0, -FLT_MAX, FLT_MAX));
 
         listener = input.newListener(this, &vectorOperations::inputListener);
     }

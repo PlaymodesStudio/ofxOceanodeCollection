@@ -20,7 +20,7 @@ public:
         addParameter(input0.set("Input 0", {0}, {0}, {1}));
         addParameter(input1.set("Input 1", {0}, {0}, {1}));
         addParameter(input2.set("Input 2", {0}, {0}, {1}));
-        addParameter(output.set("Output", {0}, {0}, {1}));
+        addOutputParameter(output.set("Output", {0}, {0}, {1}));
 
         listener = inputSelector.newListener([this](vector<int> &v){
             int size = max(max(input0->size(), input1->size()), max(input2->size(), v.size()));

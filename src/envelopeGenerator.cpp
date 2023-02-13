@@ -36,7 +36,7 @@ envelopeGenerator::envelopeGenerator() : ofxOceanodeNodeModel("Envelope Generato
     addParameter(releaseBiPow.set("R.BiPow", {0}, {-1}, {1}));
     
     addParameter(curvePreview.set("Curve", {0}, {0}, {1}));
-    addParameter(output.set("Output", {0}, {0}, {1}));
+    addOutputParameter(output.set("Output", {0}, {0}, {1}));
     oldGateIn = {0};
     
     outputComputeVec = {0};
