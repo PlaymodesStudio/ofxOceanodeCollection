@@ -125,7 +125,7 @@ void vectorItemOperations::computeOutput(vector<float> &in){
 			case 11: //Log
 			{
 				for(int i = 0; i < tempOut.size(); i++){
-					tempOut[i] = log(getValueForIndex(in1, i) / log(getValueForIndex(in2, i)));
+					tempOut[i] = log(getValueForIndex(in1, i)) / log(getValueForIndex(in2, i));
 				}
 				break;
 			}
