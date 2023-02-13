@@ -18,9 +18,9 @@ public:
     manualVector() : ofxOceanodeNodeModel("Manual Vector"){}
     
     void setup(){
-        addParameter(size.set("Size", 10, 2, 100));
-        addParameter(minVal.set("Min", 0, -1000, 1000));
-        addParameter(maxVal.set("Max", 1, -1000, 1000));
+        addParameter(size.set("Size", 10, 2, INT_MAX));
+        addParameter(minVal.set("Min", 0, -FLT_MAX, FLT_MAX));
+        addParameter(maxVal.set("Max", 1, -FLT_MAX, FLT_MAX));
         
         addCustomRegion(customWidget, [this](){
             auto values_getter = [](void* data, int idx)-> float
@@ -147,7 +147,7 @@ public:
         
         vectorValue.resize(size, 0);
         
-        addParameter(vectorValueParam.set("Out", vectorValue, vector<float>(1, minVal), vector<float>(1, maxVal)), ofxOceanodeParameterFlags_DisableInConnection);
+        addParameter(vectorValueParam.set("Out", vectorValue, vector<float>(1, minVal), vector<float>(1, maxVal)), ofxOceanodeParameterFlags_DisableInConnection | ofxOceanodeParameterFlags_DisplayMinimized);
         
         listeners.push(size.newListener([this](int &s){
             vectorValue.resize(size);
