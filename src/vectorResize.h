@@ -23,6 +23,10 @@ public:
         addInspectorParameter(fill.set("Fill", false));
         
         listener = input.newListener(this, &vectorResize::inputListener);
+        listener2 = size.newListener([this](int &i){
+            vector<float> v = input.get();
+            inputListener(v);
+        });
     };
     
     void loadBeforeConnections(ofJson &json){
@@ -100,6 +104,7 @@ private:
     }
     
     ofEventListener listener;
+    ofEventListener listener2;
     
     ofParameter<vector<float>>  input;
     ofParameter<int> size;
