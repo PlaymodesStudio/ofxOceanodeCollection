@@ -60,19 +60,37 @@ public:
                 int res_w = ImMin((int)frame_size.x, values_count);
                 int item_count = values_count;
 
+                
                 auto mousePos = ImGui::GetIO().MousePos;
+                auto mousePosPrev = mousePos - ImGui::GetIO().MouseDelta;
+            
                 // modify on mouse down
-                if (ImGui::IsItemActive() && ImGui::IsMouseDown(0))//if (hovered && inner_bb.Contains(mousePos) && press)
+                if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0, 0))//if (hovered && inner_bb.Contains(mousePos) && press)
                 {
-                    const float t = ImClamp((mousePos.x - inner_bb.Min.x) / (inner_bb.Max.x - inner_bb.Min.x), 0.0f, 0.9999f);
-                    const float nVal = 1 - ImClamp((mousePos.y - inner_bb.Min.y) / (inner_bb.Max.y - inner_bb.Min.y), 0.0f, 1.0f);
-                    const int v_idx = (int)(t * item_count);
-                    IM_ASSERT(v_idx >= 0 && v_idx < values_count);
+                    const float t0 = ImClamp((mousePos.x - inner_bb.Min.x) / (inner_bb.Max.x - inner_bb.Min.x), 0.0f, 0.9999f);
+                    const float t1 = ImClamp((mousePosPrev.x - inner_bb.Min.x) / (inner_bb.Max.x - inner_bb.Min.x), 0.0f, 0.9999f);
+                    float nVal0 = 1 - ImClamp((mousePos.y - inner_bb.Min.y) / (inner_bb.Max.y - inner_bb.Min.y), 0.0f, 1.0f);
+                    float nVal1 = 1 - ImClamp((mousePosPrev.y - inner_bb.Min.y) / (inner_bb.Max.y - inner_bb.Min.y), 0.0f, 1.0f);
+                    int v_idx0 = (int)(t0 * item_count);
+                    int v_idx1 = (int)(t1 * item_count);
+                    IM_ASSERT(v_idx0 >= 0 && v_idx0 < values_count);
+                    IM_ASSERT(v_idx1 >= 0 && v_idx1 < values_count);
 
-                    vectorValue[v_idx] = ofMap(nVal, 0, 1, scale_min, scale_max, true);
-                    if(ImGui::GetIO().KeyShift) vectorValue[v_idx] = (int)vectorValue[v_idx];
+                    if(v_idx1 < v_idx0){
+                        std::swap(v_idx0, v_idx1);
+                        std::swap(nVal0, nVal1);
+                    }
                     
-                    idx_hovered = v_idx;
+                    for(int v_idx = v_idx0; v_idx <= v_idx1; v_idx++){
+                        float pctPos = 0;
+                        if(v_idx0 != v_idx1){
+                            pctPos = float(v_idx-v_idx0) / float(v_idx1-v_idx0);
+                        }
+                        vectorValue[v_idx] = ofMap(ofLerp(nVal0, nVal1, pctPos), 0, 1, scale_min, scale_max, true);
+                        if(ImGui::GetIO().KeyShift) vectorValue[v_idx] = round(vectorValue[v_idx]);
+                    }
+                    
+                    idx_hovered = v_idx0;
                 }
                 
                 if(ImGui::IsItemClicked(1) || (ImGui::IsPopupOpen("Value Popup") && ImGui::IsMouseClicked(1))){
@@ -133,6 +151,18 @@ public:
                 if (ImGui::BeginPopupContextItem("Value Popup"))
                 {
                     ImGui::Text("%s", ("Edit item " + ofToString(currentToEditValue)).c_str());
+                    if(currentToEditValue > 0){
+                        ImGui::SameLine();
+                        if(ImGui::Button("<<")){
+                            currentToEditValue--;
+                        }
+                    }
+                    if(currentToEditValue < size-1){
+                        ImGui::SameLine();
+                        if(ImGui::Button(">>")){
+                            currentToEditValue++;
+                        }
+                    }
                     ImGui::SliderFloat("##edit", &vectorValue[currentToEditValue], vectorValueParam.getMin()[0], vectorValueParam.getMax()[0], "%.4f");
                     if (ImGui::Button("Close"))
                         ImGui::CloseCurrentPopup();
