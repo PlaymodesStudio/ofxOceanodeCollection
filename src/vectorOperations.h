@@ -59,7 +59,6 @@ private:
                 for(auto f : vf){
                     sum += f;
                 }
-                sum = ofClamp(sum, 0, 1);
                 output = sum;
                 break;
             }
