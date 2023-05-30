@@ -35,30 +35,32 @@ public:
     
 private:
     void inputListener(vector<float> &v){
+        int _size = size;
+        if(_size < 1) _size = 1;
         if(v.size() > 0){
             if(!resample){
                 vector<float> tempOut = v;
-                if(fill && size > v.size()){
-                    while(tempOut.size() < size){
+                if(fill && _size > v.size()){
+                    while(tempOut.size() < _size){
                         tempOut.insert(tempOut.end(), v.begin(), v.end());
                     }
                 }
-                tempOut.resize(size, 0);
+                tempOut.resize(_size, 0);
                 
                 output = tempOut;
             }else{
-			if(v.size() == size){
+			if(v.size() == _size){
 				output = v;
-			}else if(v.size() < size){
-				vector<float> tempOut(size, 0);
-				for(int i = 0; i < size; i++){
-					tempOut[i] = v[(int)(((float)i / (float)size) * v.size())];
+			}else if(v.size() < _size){
+				vector<float> tempOut(_size, 0);
+				for(int i = 0; i < _size; i++){
+					tempOut[i] = v[(int)(((float)i / (float)_size) * v.size())];
 				}
 				output = tempOut;
 			}else{
-				vector<float> tempOut(size, 0);
-				for(int i = 0; i < size; i++){
-					float index = (((float)i / (float)size) * v.size());
+				vector<float> tempOut(_size, 0);
+				for(int i = 0; i < _size; i++){
+					float index = (((float)i / (float)_size) * v.size());
 					switch(interp){
 						case 0:
 							tempOut[i] = v[(int)index];
@@ -66,7 +68,7 @@ private:
 						case 1:{
 							float tempSum = 0;
 							int steps = 0;
-							for(int j = floor(index); j < floor(index + (v.size()/size)); j++){
+							for(int j = floor(index); j < floor(index + (v.size()/_size)); j++){
 								tempSum += v[j];
 								steps++;
 							}
@@ -75,7 +77,7 @@ private:
 						}
 							case 2:{
 								float minVal = FLT_MAX;
-								for(int j = floor(index); j < floor(index + (v.size()/size)); j++){
+								for(int j = floor(index); j < floor(index + (v.size()/_size)); j++){
 									if(v[j] < minVal){
 										minVal = v[j];
 									}
@@ -85,7 +87,7 @@ private:
 							}
 							case 3:{
 								float maxVal = -FLT_MAX;
-								for(int j = floor(index); j < floor(index + (v.size()/size)); j++){
+								for(int j = floor(index); j < floor(index + (v.size()/_size)); j++){
 									if(v[j] > maxVal){
 										maxVal = v[j];
 									}
