@@ -1,5 +1,14 @@
+//
+//  euclideanGenerator.cpp
+
+//
+//  Created by Eduard Frigola on 25/08/2018.
+//
+//
+
 #include "euclideanGenerator.h"
 #include <algorithm>
+
 
 euclideanGenerator::euclideanGenerator() : ofxOceanodeNodeModel("Euclidean Generator"){
     addParameter(input.set("Input", 0, 0, 1));
@@ -10,12 +19,10 @@ euclideanGenerator::euclideanGenerator() : ofxOceanodeNodeModel("Euclidean Gener
     addOutputParameter(outputBool.set("Out.Bool", false));
     addOutputParameter(outputSteps.set("Steps", {0}, {0}, {1}));
     addOutputParameter(outputIndex.set("Index", 0, 0, 1));
-    addOutputParameter(pulseOutput.set("Pulse Output", {0}, {0}, {1})); // New pulse output parameter
-
     listeners.push(input.newListener(this, &euclideanGenerator::computeOutput));
     listeners.push(onsets.newListener(this, &euclideanGenerator::computeAlgorithm));
     listeners.push(divisions.newListener(this, &euclideanGenerator::computeAlgorithm));
-
+    
     listeners.push(offset.newListener([this](int &i){
         vector<float> tempOutSteps(sequence.size(), 0);
         for(int i = 0; i < sequence.size(); i++) tempOutSteps[(i+offset)%sequence.size()] = sequence[i];
@@ -32,19 +39,15 @@ void euclideanGenerator::computeOutput(float &f){
     }
     outputBool = sequence[int(f/ (1.0/divisions))];
     vector<float> tempOutput(onsets, 0);
-    vector<float> pulseOut(onsets, 0);
     for(int i = 1; i < onsets+1; i++){
         if(f < divisionPositions[i] && f > divisionPositions[i-1]){
             tempOutput[i-1] = ofMap(f, divisionPositions[i-1], divisionPositions[i], 0, 1, true);
-            pulseOut[i-1] = 1;
             outputIndex = i-1;
         }else{
             tempOutput[i-1] = 0;
-            pulseOut[i-1] = 0;
         }
     }
     output = tempOutput;
-    pulseOutput = pulseOut;
 }
 
 void euclideanGenerator::computeAlgorithm(int &i){
@@ -64,7 +67,8 @@ void euclideanGenerator::computeAlgorithm(int &i){
         outputIndex.set(0);
         parameterChangedMinMax.notify(this, outputindexName);
     }
-
+    
+//    ofLog() << "NEW SEQ";
     if(onsets <= divisions){
         vector<vector<bool>> ones(onsets, vector<bool>(1, true));
         vector<vector<bool>> zeros(divisions-onsets, vector<bool>(1, false));
@@ -77,11 +81,13 @@ void euclideanGenerator::computeAlgorithm(int &i){
         divisionPositions.clear();
         sequence = result[0];
         for(int i = 0; i < sequence.size(); i++){
+//            cout<<sequence[i];
             if(sequence[i]){
                 divisionPositions.push_back((1.0/divisions) * i);
             }
         }
         divisionPositions.push_back(1);
+//        cout<<endl;
     }
     vector<float> tempOutSteps(sequence.size(), 0);
     for(int i = 0; i < sequence.size(); i++) tempOutSteps[(i+offset)%sequence.size()] = sequence[i];
@@ -89,6 +95,14 @@ void euclideanGenerator::computeAlgorithm(int &i){
 }
 
 vector<vector<bool>> euclideanGenerator::moveZeros(vector<vector<bool>> in){
+    for(auto v : in){
+//        cout << "[";
+        for(auto _v : v){
+//            cout << _v;
+        }
+//        cout << "] ";
+    }
+//    cout << endl;
     bool lastSequenceHasFalse = false;
     for(auto b : in.back()) if(!b) lastSequenceHasFalse = true;
     if(in.size() == 1 || in.back() != in.at(in.size()-2) || !lastSequenceHasFalse){
