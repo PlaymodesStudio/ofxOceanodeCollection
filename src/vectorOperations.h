@@ -37,7 +37,7 @@ private:
         switch (static_cast<operations>(operationSelector+1)) {
             case MIN_OP:
             {
-                float minVal = 1;
+                float minVal = FLT_MAX;  // initialize minVal to the maximum float value
                 for(auto f : vf){
                     if(f < minVal) minVal = f;
                 }
