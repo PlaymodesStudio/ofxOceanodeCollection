@@ -35,6 +35,8 @@
 #include "vectorReorder.h"
 #include "vectorDistributor.h"
 #include "vectorRotator.h"
+#include "slotEaser.h"
+#include "valueModifier.h"
 
 
 #include "ofxOceanode.h"
@@ -67,6 +69,8 @@ static void registerModels(ofxOceanode &o){
     o.registerModel<vectorReorder>("Collection");
     o.registerModel<vectorDistributor>("Collection");
     o.registerModel<vectorRotator>("Collection");
+    o.registerModel<slotEaser>("Collection");
+    o.registerModel<valueModifier>("Collection");
 }
 }
 
