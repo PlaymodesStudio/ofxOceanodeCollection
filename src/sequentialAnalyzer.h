@@ -45,32 +45,34 @@ public:
 //        }));
 
         listeners.push(input.newListener([this](vector<float> &vf){
-            bool inputTriggered = false;
-            if(vf.size() != lastInput.size()) lastInput = vector<float>(vf.size(), 0);
-
-            if(resetCount.get()){   // Check if resetCount is true
-                fallingEdgeCount = 0;
-                resetCount = false;
-            }
-
-            for(int i = 0; i < vf.size(); i++){
-                if(vf[i] >= threshold && lastInput[i] < threshold){
-                    inputTriggered = true;
+            if(outputSize > 0){
+                bool inputTriggered = false;
+                if(vf.size() != lastInput.size()) lastInput = vector<float>(vf.size(), 0);
+                
+                if(resetCount.get()){   // Check if resetCount is true
+                    fallingEdgeCount = 0;
+                    resetCount = false;
                 }
-                if(vf[i] < threshold && lastInput[i] >= threshold){
-                    fallingEdgeCount++;
-                    countOutput = fallingEdgeCount;
+                
+                for(int i = 0; i < vf.size(); i++){
+                    if(vf[i] >= threshold && lastInput[i] < threshold){
+                        inputTriggered = true;
+                    }
+                    if(vf[i] < threshold && lastInput[i] >= threshold){
+                        fallingEdgeCount++;
+                        countOutput = fallingEdgeCount;
+                    }
                 }
-            }
-            lastInput = vf;
-
-            if(inputTriggered){
-                currentPosition += step;
-                currentPosition %= (outputSize * step);
-                floatOutput = (float)currentPosition/(float)(outputSize * step);
-                vector<float> tempPulseOutput(outputSize * step, 0);
-                tempPulseOutput[currentPosition] = 1;
-                pulseOutput = tempPulseOutput;
+                lastInput = vf;
+                
+                if(inputTriggered){
+                    currentPosition += step;
+                    currentPosition %= (outputSize * step);
+                    floatOutput = (float)currentPosition/(float)(outputSize * step);
+                    vector<float> tempPulseOutput(outputSize * step, 0);
+                    tempPulseOutput[currentPosition] = 1;
+                    pulseOutput = tempPulseOutput;
+                }
             }
         }));
     }
