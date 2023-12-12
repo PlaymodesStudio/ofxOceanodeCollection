@@ -10,55 +10,57 @@
 #define vectorGetter_h
 
 #include "ofxOceanodeNodeModel.h"
+#include <vector>
 
 class vectorGetter : public ofxOceanodeNodeModel{
 public:
     vectorGetter() : ofxOceanodeNodeModel("Vector Getter"){
         addParameter(input.set("Input", {0, 0}, {-FLT_MAX}, {FLT_MAX}));
-        addParameter(index.set("Index", 0, 0, 1));
-        addOutputParameter(output.set("Output", 0, -FLT_MAX, FLT_MAX));
+        addParameter(index.set("Index", {0}, {0}, {INT_MAX}));
+        addOutputParameter(output.set("Output", {0}, {-FLT_MAX}, {FLT_MAX}));
         
-        lastSize = 1;
-        wishIndex = -1;
+        listener = input.newListener([this](vector<float> &v){
+            inputListener(v);
+        });
         
-        listener = input.newListener(this, &vectorGetter::inputListener);
+        indexListener = index.newListener([this](vector<int> &idx){
+            indexListenerFunc(idx);
+        });
     };
-    
-    void presetRecallAfterSettingParameters(ofJson &json) override{
-        if(json.count("Index") == 1){
-            wishIndex = ofToInt(json["Index"].get<string>());
-        }
-    }
-    
+
     ~vectorGetter(){};
-    
+
 private:
     void inputListener(vector<float> &v){
-        if(v.size() > 1){
-            if(v.size() != lastSize){
-                if(index > v.size()-1) index.set(v.size()-1);
-                index.setMax(v.size() - 1);
-                string indexName = "Index";
-                parameterChangedMinMax.notify(this, indexName);
-                if(wishIndex != -1 && wishIndex < v.size()){
-                    index = wishIndex;
-                }
-                lastSize = v.size();
-            }
-            if(v.size() > index){
-                output = v[index];
+        std::vector<float> result;
+        auto idx = index.get();
+        for(const auto& i : idx){
+            if(i < v.size()){
+                result.push_back(v[i]);
             }
         }
+        output = result;
     }
-    
+
+    void indexListenerFunc(vector<int> &idx){
+        std::vector<float> result;
+        auto inputValue = input.get();
+        for(const auto& i : idx){
+            if(i < inputValue.size()){
+                result.push_back(inputValue[i]);
+            }
+        }
+        output = result;
+    }
+
     ofEventListener listener;
-    
+    ofEventListener indexListener;
+
     ofParameter<vector<float>>  input;
-    ofParameter<int> index;
-    ofParameter<float>  output;
-    int lastSize;
-    int wishIndex;
+    ofParameter<vector<int>>    index;
+    ofParameter<vector<float>>  output;
 };
 
 #endif /* vectorGetter_h */
+
 
