@@ -31,7 +31,7 @@ void manualOscillatorBank::computeValues(float &f){
     if(oldPhasor > f) bufferOverflow++;
     oldPhasor = f;
     
-    indexedBuffer.push_front(make_pair(f+bufferOverflow, manualInput));
+    indexedBuffer.push_front(std::make_pair(f+bufferOverflow, manualInput));
     
     vector<float>   tempOut;
     tempOut.resize(indexs->size(), 0);
@@ -59,7 +59,7 @@ void manualOscillatorBank::computeValues(float &f){
             }
         }
 
-        minBufferOverflow = min((int)newBuffIndex, minBufferOverflow);
+        minBufferOverflow = std::min((int)newBuffIndex, minBufferOverflow);
     }
     if((int)indexedBuffer.back().first < minBufferOverflow){
         bufferOverflow--;

@@ -90,7 +90,7 @@ void vectorItemOperations::computeOutput(vector<float> &in){
             case 6:
             {
                 for(int i = 0; i < tempOut.size(); i++){
-                    tempOut[i] = min(getValueForIndex(in1, i), getValueForIndex(in2, i));
+                    tempOut[i] = std::min(getValueForIndex(in1, i), getValueForIndex(in2, i));
                 }
                 break;
             }
