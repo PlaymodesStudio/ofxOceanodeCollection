@@ -8,7 +8,7 @@
 #ifndef manualVector_h
 #define manualVector_h
 
-#define IMGUI_DEFINE_MATH_OPERATORS
+//#define IMGUI_DEFINE_MATH_OPERATORS
 
 #include "ofxOceanodeNodeModel.h"
 #include "imgui_internal.h"
