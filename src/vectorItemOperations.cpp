@@ -104,7 +104,11 @@ void vectorItemOperations::computeOutput(vector<float> &in){
 			case 8: //Div
 			{
 				for(int i = 0; i < tempOut.size(); i++){
-					tempOut[i] = (getValueForIndex(in1, i) / getValueForIndex(in2, i));
+                    if(getValueForIndex(in2, i) == 0){
+                        tempOut[i] = 0;
+                    }else{
+                        tempOut[i] = (getValueForIndex(in1, i) / getValueForIndex(in2, i));
+                    }
 				}
 				break;
 			}
