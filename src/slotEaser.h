@@ -53,20 +53,15 @@ public:
         }));
         
         listeners.push(phasor.newListener([this](float &vf){
-            if(input>numInputs-1)
-            {
-                input=numInputs-1;
-            }
-
+            int maxSize = 0;
             for(int i = 1; i < numInputs; i++){
-                if(slots[0]->size() != slots[i]->size()){
-                    return;
+                if(slots[i]->size() > maxSize){
+                    maxSize = slots[i]->size();
                 }
             }
-            if(slots[0].get().size() != lastSize){
-                int inputSize = slots[0].get().size();
-                vector<float> tempOutput = vector<float>(slots[0]->size());
-                for(int i = 0; i < slots[0].get().size(); i++){
+            if(maxSize != lastSize){
+                vector<float> tempOutput = vector<float>(slots[input]->size());
+                for(int i = 0; i < slots[input].get().size(); i++){
                     tempOutput[i] = slots[input]->at(i);
                 }
                 lastInput = input;
@@ -74,11 +69,10 @@ public:
                 phasorValueOnValueChange = vf;
                 lastPhase = 0;
                 reachedMax = false;
-                lastSize = inputSize;
-                lastOutput = slots[input];
+                lastSize = maxSize;
+                lastOutput = tempOutput;
             }else{
-                int inputSize = slots[0].get().size();
-//                for(int i = 0; i < inputSize; i++){
+                int inputSize = maxSize;
                 if(lastInput != input){
                     phasorValueOnValueChange = vf;
                     reachedMax = false;
@@ -86,9 +80,8 @@ public:
                     lastOutput = output;
                     lastChangedInput = lastInput;
                 }
-//                }
-                vector<float> tempOutput = vector<float>(slots[0]->size());
-                if(lastOutput.size() == slots[input]->size()){
+                vector<float> tempOutput = vector<float>(maxSize);
+                if(maxSize == slots[input]->size() && maxSize == slots[lastInput]->size() && maxSize == lastOutput.size()){
                     for(int i = 0; i < inputSize; i++){
                         float phase = vf - phasorValueOnValueChange;
                         if(phase < 0) phase = 1+phase;
