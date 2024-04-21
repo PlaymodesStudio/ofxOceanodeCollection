@@ -53,6 +53,11 @@ public:
         }));
         
         listeners.push(phasor.newListener([this](float &vf){
+            if(input>numInputs-1)
+            {
+                input=numInputs-1;
+            }
+
             for(int i = 1; i < numInputs; i++){
                 if(slots[0]->size() != slots[i]->size()){
                     return;
