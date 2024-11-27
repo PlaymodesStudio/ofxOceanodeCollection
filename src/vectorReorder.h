@@ -13,14 +13,15 @@
 
 enum func{
     SORT_OP = 1,
-    INVERT_OP = 2
+    INVERT_OP = 2,
+    BYPASS_OP = 3
 };
 
 class vectorReorder : public ofxOceanodeNodeModel{
 public:
     vectorReorder() : ofxOceanodeNodeModel("Vector Reorder"){
         addParameter(input.set("Input", {0}, {-FLT_MAX}, {FLT_MAX}));
-        addParameterDropdown(funcSelector, "Op.", 0, {"Sort", "Invert"});
+        addParameterDropdown(funcSelector, "Op.", 0, {"Sort", "Invert", "Bypass"});
         addOutputParameter(output.set("Output", {0}, {-FLT_MAX}, {FLT_MAX}));
 
         listener = input.newListener(this, &vectorReorder::inputListener);
@@ -44,6 +45,12 @@ private:
                 output = cpy;
                 break;
             }
+            case BYPASS_OP:
+            {
+                output = input;
+                break;
+            }
+                
             default:
                 break;
         }
