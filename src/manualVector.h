@@ -177,8 +177,11 @@ public:
         addParameter(vectorValueParam.set("Out", vectorValue, vector<float>(1, minVal), vector<float>(1, maxVal)), ofxOceanodeParameterFlags_DisableInConnection | ofxOceanodeParameterFlags_DisplayMinimized);
         
         listeners.push(size.newListener([this](int &s){
-            vectorValue.resize(size);
-            vectorValueParam = vectorValue;
+            if(size>=2)
+            {
+                vectorValue.resize(size);
+                vectorValueParam = vectorValue;
+            }
         }));
         
         listeners.push(minVal.newListener([this](float &f){
