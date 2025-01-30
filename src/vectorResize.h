@@ -103,6 +103,11 @@ private:
 			}
             }
         }
+        else if (v.size() == 0){
+            vector<float> tempOut(0, 0);
+            output = tempOut;
+        }
+            
     }
     
     ofEventListener listener;
