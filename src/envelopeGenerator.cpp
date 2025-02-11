@@ -229,18 +229,58 @@ float envelopeGenerator::smoothinterpolate(float start, float end, float pos){
     
 }
 
-void envelopeGenerator::recalculatePreviewCurve(){
+void envelopeGenerator::gateInChanged(vector<float> &vf){
+    for(int i = 0; i < vf.size(); i++){
+        float currentGateValue = vf[i];
+        if(lastInput[i] == 0 && currentGateValue == 1) {
+            // Detect transition from 0 to 1 and start the envelope
+            if(getValueForIndex(attack, i) == 0){
+                if(getValueForIndex(decay, i) == 0){
+                    envelopeStage[i] = envelopeSustain;
+                }else{
+                    envelopeStage[i] = envelopeDecay;
+                }
+            }else{
+                envelopeStage[i] = envelopeAttack;
+            }
+            phasorValueOnValueChange[i] = 0;  // Reset the phasor
+            lastPhase[i] = 0;
+            reachedMax[i] = false;
+        } else if(lastInput[i] == 1 && currentGateValue == 0) {
+            // Detect transition from 1 to 0 (end of the envelope)
+            if(getValueForIndex(release, i) > 0){
+                envelopeStage[i] = envelopeRelease;
+            }else{
+                envelopeStage[i] = envelopeEnd;
+            }
+            phasorValueOnValueChange[i] = 0;  // Reset the phasor
+            lastPhase[i] = 0;
+            reachedMax[i] = false;
+        }
+        lastInput[i] = currentGateValue;  // Store current value for next comparison
+    }
+}
+
+
+void envelopeGenerator::recalculatePreviewCurve() {
     int maxSize = 100;
     vector<float> tempOutput;
-    //attack
-    int attackSize = attack->at(0)*maxSize;
+    
+    if(attack->empty() || decay->empty() || sustain->empty() || release->empty() ||
+       attackPow->empty() || attackBiPow->empty() || decayPow->empty() ||
+       decayBiPow->empty() || releasePow->empty() || releaseBiPow->empty()) {
+        return;
+    }
+
+    // Attack
+    int attackSize = std::max(0, std::min(maxSize, static_cast<int>(attack->at(0) * maxSize)));
     tempOutput.resize(attackSize);
-    for(int i = 0; i < attackSize; i++){
+    for(int i = 0; i < attackSize; i++) {
         float phase = float(i) / float(attackSize);
-        if(attackPow->at(0) != 0){
+        if(!attackPow->empty() && attackPow->at(0) != 0) {
             customPow(phase, attackPow->at(0));
         }
-        if(attackBiPow->at(0) != 0){
+        if(!attackBiPow->empty() && attackBiPow->at(0) != 0) {
             phase = (phase*2) - 1;
             customPow(phase, attackBiPow->at(0));
             phase = (phase + 1) / 2.0;
@@ -248,22 +288,24 @@ void envelopeGenerator::recalculatePreviewCurve(){
         tempOutput[i] = smoothinterpolate(0, 1, phase);
     }
     
-//    //Hold
-//    int holdSize = hold->at(0)*maxSize;
-//    int holdPos = tempOutput.size();
-//    tempOutput.resize(holdPos + holdSize);
-//    fill(tempOutput.begin()+holdPos, tempOutput.end(), 1);
-//
-    //Decay
-    int decaySize = decay->at(0)*maxSize;
+    //Hold
+    /*
+    int holdSize = hold->at(0)*maxSize;
+    int holdPos = tempOutput.size();
+    tempOutput.resize(holdPos + holdSize);
+    fill(tempOutput.begin()+holdPos, tempOutput.end(), 1);
+     */
+
+    // Decay
+    int decaySize = std::max(0, std::min(maxSize, static_cast<int>(decay->at(0) * maxSize)));
     int decayPos = tempOutput.size();
     tempOutput.resize(decayPos + decaySize);
-    for(int i = 0; i < decaySize; i++){
+    for(int i = 0; i < decaySize; i++) {
         float phase = float(i) / float(decaySize);
-        if(decayPow->at(0) != 0){
+        if(!decayPow->empty() && decayPow->at(0) != 0) {
             customPow(phase, decayPow->at(0));
         }
-        if(decayBiPow->at(0) != 0){
+        if(!decayBiPow->empty() && decayBiPow->at(0) != 0) {
             phase = (phase*2) - 1;
             customPow(phase, decayBiPow->at(0));
             phase = (phase + 1) / 2.0;
@@ -271,28 +313,30 @@ void envelopeGenerator::recalculatePreviewCurve(){
         tempOutput[decayPos + i] = smoothinterpolate(1, sustain->at(0), phase);
     }
     
-    //Sustain
+    // Sustain
     int sustainSize = maxSize/2;
     int sustainPos = tempOutput.size();
     tempOutput.resize(sustainPos + sustainSize);
     fill(tempOutput.begin()+sustainPos, tempOutput.end(), sustain->at(0));
-    
-    //Release
-    int releaseSize = release->at(0)*maxSize;
+
+    // Release
+    int releaseSize = std::max(0, std::min(maxSize, static_cast<int>(release->at(0) * maxSize)));
     int releasePos = tempOutput.size();
     tempOutput.resize(releasePos + releaseSize);
-    for(int i = 0; i < releaseSize; i++){
+    for(int i = 0; i < releaseSize; i++) {
         float phase = float(i) / float(releaseSize);
-        if(releasePow->at(0) != 0){
+        if(!releasePow->empty() && releasePow->at(0) != 0) {
             customPow(phase, releasePow->at(0));
         }
-        if(releaseBiPow->at(0) != 0){
+        if(!releaseBiPow->empty() && releaseBiPow->at(0) != 0) {
             phase = (phase*2) - 1;
             customPow(phase, releaseBiPow->at(0));
             phase = (phase + 1) / 2.0;
         }
         tempOutput[releasePos + i] = smoothinterpolate(sustain->at(0), 0, phase);
     }
-    
+
     curvePreview = tempOutput;
 }
+
+
