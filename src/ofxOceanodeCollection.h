@@ -11,6 +11,7 @@
 
 #include "delta.h"
 #include "dummySliders.h"
+#include "dummySlidersDynamic.h"
 #include "envelopeGenerator.h"
 #include "euclideanGenerator.h"
 #include "manualOscillatorBank.h"
@@ -37,6 +38,7 @@
 #include "vectorRotator.h"
 #include "slotEaser.h"
 #include "valueModifier.h"
+#include "textureEaser.h"
 #include "histogram.h"
 
 
@@ -46,6 +48,7 @@ namespace ofxOceanodeCollection{
 static void registerModels(ofxOceanode &o){
     o.registerModel<delta>("Collection"); 
     o.registerModel<dummySliders>("Collection");
+    o.registerModel<dummySlidersDynamic>("Collection");
     o.registerModel<envelopeGenerator>("Collection");
     o.registerModel<euclideanGenerator>("Collection");
     o.registerModel<manualOscillatorBank>("Collection");
@@ -72,6 +75,7 @@ static void registerModels(ofxOceanode &o){
     o.registerModel<vectorRotator>("Collection");
     o.registerModel<slotEaser>("Collection");
     o.registerModel<valueModifier>("Collection");
+    o.registerModel<textureEaser>("Collection");
     o.registerModel<histogram>("Collection");
 }
 }
