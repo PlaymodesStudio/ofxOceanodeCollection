@@ -28,7 +28,6 @@ private:
 	ofParameter<vector<float>>	weights;
     ofParameter<vector<float>>   variance;
 	ofParameter<vector<float>> mean;
-	ofParameter<vector<float>> smoothChange;
     
     deque<vector<float>>   inputStore;
 };
