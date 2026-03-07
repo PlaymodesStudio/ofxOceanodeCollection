@@ -34,6 +34,7 @@ private:
     ofParameter<vector<float>> bipow;
     ofParameter<vector<float>> output;
     ofParameter<bool> shortestPath;
+    ofParameter<bool> positivePath;
     
     ofEventListener listener;
     vector<float> lastInput;

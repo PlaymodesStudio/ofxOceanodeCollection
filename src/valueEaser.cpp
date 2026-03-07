@@ -15,6 +15,7 @@ valueEaser::valueEaser() : ofxOceanodeNodeModel("Value Easer"){
     addOutputParameter(output.set("Output", {0}, {-FLT_MAX}, {FLT_MAX}));
     
     addInspectorParameter(shortestPath.set("Shortest Path", false));
+    addInspectorParameter(positivePath.set("Positive Path", false));
     
     color = ofColor::green;
     
@@ -51,7 +52,10 @@ valueEaser::valueEaser() : ofxOceanodeNodeModel("Value Easer"){
                 if(phase < lastPhase[i]) reachedMax[i] = true;
                 else lastPhase[i] = phase;
                 if(!reachedMax[i]){
-                    if(shortestPath && abs(lastChangedValue[i] - input.get()[i]) > 0.5){
+                    if(positivePath && lastChangedValue[i] > input.get()[i]){
+                        tempOutput[i] = fmod(smoothinterpolate(lastChangedValue[i], input.get()[i]+1, phase), 1.0f);
+                    }
+                    else if(shortestPath && abs(lastChangedValue[i] - input.get()[i]) > 0.5){
                         if(lastChangedValue[i] > input.get()[i]){
                             tempOutput[i] = fmod(smoothinterpolate(lastChangedValue[i], input.get()[i]+1, phase), 1);
                         }else{
