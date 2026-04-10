@@ -86,7 +86,13 @@ private:
 	void setSeed(){
 		for(int i = 0; i < mt.size(); i++){
 			if(seed->size() == mt.size()){
-				mt[i].seed(seed->at(i));
+				int s = seed->at(i);
+				if(s == 0){
+					std::random_device rd;
+					mt[i].seed(rd());
+				}else{
+					mt[i].seed(s);
+				}
 			}
 			else{
 				if(seed->at(0) == 0){
