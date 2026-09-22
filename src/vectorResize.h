@@ -15,7 +15,7 @@ class vectorResize : public ofxOceanodeNodeModel{
 public:
     vectorResize() : ofxOceanodeNodeModel("Vector Resize"){
         addParameter(input.set("Input", {0}, {0}, {1}));
-        addParameter(size.set("Size", 1, 1, INT_MAX));
+        addParameter(size.set("Size", {1}, {0}, {(float)INT_MAX}));
         addParameter(resample.set("Resample", true));
 		addParameterDropdown(interp, "Interp", 0, {"None", "Avg", "Min", "Max"});
 		addOutputParameter(output.set("Output", {0}, {0}, {1}));
@@ -23,7 +23,7 @@ public:
         addInspectorParameter(fill.set("Fill", false));
         
         listener = input.newListener(this, &vectorResize::inputListener);
-        listener2 = size.newListener([this](int &i){
+        listener2 = size.newListener([this](vector<float> &s){
             vector<float> v = input.get();
             inputListener(v);
         });
@@ -35,7 +35,29 @@ public:
     
 private:
     void inputListener(vector<float> &v){
-        int _size = size;
+        const vector<float> &sizes = size.get();
+        
+        // Per-element repeat mode: Size is a vector -> each input item is repeated Size[i] times.
+        // e.g. Input [1,2,3,4,5], Size [2,3,2,3,4] -> [1,1,2,2,2,3,3,4,4,4,5,5,5,5]
+        // If Size is shorter than Input it wraps around. Fractional counts are distributed with
+        // cumulative rounding so the total length is round(sum of counts). Counts <= 0 drop the item.
+        if(sizes.size() > 1){
+            vector<float> tempOut;
+            double acc = 0;
+            int emitted = 0;
+            for(size_t i = 0; i < v.size(); i++){
+                float c = sizes[i % sizes.size()];
+                if(c > 0) acc += c;
+                int target = (int)std::round(acc);
+                for(; emitted < target; emitted++){
+                    tempOut.push_back(v[i]);
+                }
+            }
+            output = tempOut;
+            return;
+        }
+        
+        int _size = sizes.empty() ? 1 : (int)sizes[0];
         if(_size < 1) _size = 1;
         if(v.size() > 0){
             if(!resample){
@@ -114,7 +136,7 @@ private:
     ofEventListener listener2;
     
     ofParameter<vector<float>>  input;
-    ofParameter<int> size;
+    ofParameter<vector<float>> size;
     ofParameter<bool> resample;
     ofParameter<bool> fill;
 	ofParameter<int> interp;
