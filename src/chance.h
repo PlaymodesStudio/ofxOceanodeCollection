@@ -10,7 +10,13 @@
 #define chance_h
 
 #include "ofxOceanodeNodeModel.h"
+// Transport mode needs ofxOceanode's global transport (feature-globalTransport branch).
+// Without it the node compiles exactly as before.
+#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
+#include "ofxOceanodeDeterministicRandom.h"
+#endif
 #include <random>
+#include <cfloat>
 
 class chance : public ofxOceanodeNodeModel {
 public:
@@ -30,6 +36,12 @@ public:
 		setSeed();
 		
 		listeners.push(phaseIn.newListener([this](vector<float> &vf){
+#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
+			if(syncToTransport){
+				computeTransport();
+				return;
+			}
+#endif
 			vector<float> tempOut(output);
 			if(oldPhasor.size() != vf.size()){
 				//Resize everything
@@ -74,14 +86,108 @@ public:
 		
 		listeners.push(seed.newListener([this](vector<int> &i){
 			setSeed();
+#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
+			if(syncToTransport) computeTransport();
+#endif
 		}));
+		
+#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
+		// ---- Sync To Transport ----
+		// Output is a pure function of (Seed, Step, Prob): the roll for each cycle comes from
+		// a hash of the step instead of an RNG sequence, so scrubbing the timeline gives the
+		// same pass/fail pattern as playback. Connect Step to a Phasor "Cycle" output.
+		sessionSalt = ofxOceanodeDeterministicRandom::makeSessionSalt();
+		addInspectorParameter(syncToTransport.set("Sync To Transport", false));
+		listeners.push(syncToTransport.newListener([this](bool &b){
+			setStepInputVisible(b);
+			transportPrimed = false;
+			if(b) computeTransport();
+		}));
+		listeners.push(stepIn.newListener([this](vector<float> &){
+			// With a connected Phase, compute when the phase arrives (the Phasor sends Cycle first).
+			if(syncToTransport && !getOceanodeParameter(phaseIn).hasInConnection()) computeTransport();
+		}));
+#endif
 	}
 
 	void resetPhase(){
+#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
+		if(syncToTransport) return; // position comes from the transport
+#endif
 		setSeed();
 	}
 	
+#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
+	void loadBeforeConnections(ofJson &json) override {
+		// Restore the mode before connections so a saved "Step" connection finds its input.
+		deserializeParameter(json, syncToTransport);
+	}
+#endif
+	
 private:
+	
+	// ---- transport mode ----
+#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
+	ofParameter<bool> syncToTransport;
+	ofParameter<vector<float>> stepIn; // only present in Sync To Transport mode
+	uint64_t sessionSalt = 0;
+	bool transportPrimed = false;
+	vector<int64_t> lastTransportStep;
+	
+	void setStepInputVisible(bool visible){
+		const bool present = getParameterGroup().contains("Step");
+		if(visible && !present){
+			addParameter(stepIn.set("Step", {0}, {0}, {FLT_MAX}));
+		}else if(!visible && present){
+			getOceanodeParameter(stepIn).removeAllConnections();
+			removeParameter("Step");
+		}
+	}
+	
+	// Same seed rules as setSeed(): per-lane seeds, or single seed + lane offset; 0 = session-random.
+	uint64_t laneKey(size_t i, size_t lanes){
+		int s = 0;
+		if(seed->size() == lanes) s = seed->at(i);
+		else if(!seed->empty() && seed->at(0) != 0) s = seed->at(0) + (int)i;
+		if(s == 0) return ofxOceanodeDeterministicRandom::mix(sessionSalt ^ (uint64_t)i);
+		return ofxOceanodeDeterministicRandom::seedKey(s, sessionSalt);
+	}
+	
+	bool passes(size_t i, size_t lanes, int64_t step){
+		const float p = probability->size() == 1 ? probability->at(0)
+			: (i < probability->size() ? probability->at(i) : probability->at(0));
+		return ofxOceanodeDeterministicRandom::uniform(laneKey(i, lanes), step, 0) < p;
+	}
+	
+	void computeTransport(){
+		const auto &steps = stepIn.get();
+		if(steps.empty()) return;
+		const size_t lanes = std::max(phaseIn->size(), steps.size());
+		vector<float> tempOut(lanes, 0);
+		highInNextFrame.resize(lanes, false);
+		lastTransportStep.resize(lanes, 0);
+		for(size_t i = 0; i < lanes; i++){
+			const float stepValue = i < steps.size() ? steps[i] : steps[0];
+			const int64_t step = ofxOceanodeDeterministicRandom::stepFromFloat(stepValue);
+			const bool pass = passes(i, lanes, step);
+			if(highInNextFrame[i]){ // second half of a retrigger
+				highInNextFrame[i] = false;
+				tempOut[i] = pass ? 1 : 0;
+			}else{
+				tempOut[i] = pass ? 1 : 0;
+				// Retrig: two passing cycles in a row during continuous playback -> one-frame dip.
+				const bool advancedByOne = transportPrimed && step == lastTransportStep[i] + 1;
+				if(retrigger && pass && advancedByOne && passes(i, lanes, step - 1)){
+					tempOut[i] = 0;
+					highInNextFrame[i] = true;
+				}
+			}
+			lastTransportStep[i] = step;
+		}
+		transportPrimed = true;
+		output = tempOut;
+	}
+#endif
 	
 	void setSeed(){
 		for(int i = 0; i < mt.size(); i++){
