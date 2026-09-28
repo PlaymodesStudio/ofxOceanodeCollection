@@ -24,6 +24,7 @@ public:
 		addInspectorParameter(fineAdjustFactor.set("Fine Adjust", 0.01, 0.0001, 0.5));
 		
 		addCustomRegion(customWidget, [this](){
+			bool editedValueInWidget = false;
 			auto values_getter = [](void* data, int idx)-> float
 			{
 				const float v = *(const float*)(const void*)((const unsigned char*)data + (size_t)idx * sizeof(float));
@@ -90,6 +91,7 @@ public:
 				// modify on mouse down
 				if (ImGui::IsItemActive() && ImGui::IsMouseDragging(0, 0))
 				{
+					const auto valuesBeforeDrag = vectorValue;
 					const float t0 = ImClamp((mousePos.x - inner_bb.Min.x) / (inner_bb.Max.x - inner_bb.Min.x), 0.0f, 0.9999f);
 					const float t1 = ImClamp((mousePosPrev.x - inner_bb.Min.x) / (inner_bb.Max.x - inner_bb.Min.x), 0.0f, 0.9999f);
 					
@@ -122,6 +124,7 @@ public:
 						vectorValue[v_idx] = ofMap(ofLerp(nVal0, nVal1, pctPos), 0, 1, scale_min, scale_max, true);
 						if(ImGui::GetIO().KeyShift) vectorValue[v_idx] = round(vectorValue[v_idx]);
 					}
+					editedValueInWidget |= vectorValue != valuesBeforeDrag;
 					
 					idx_hovered = v_idx0;
 				}
@@ -182,12 +185,12 @@ public:
 							currentToEditValue++;
 						}
 					}
-					ImGui::SliderFloat("##edit", &vectorValue[currentToEditValue], vectorValueParam.getMin()[0], vectorValueParam.getMax()[0], "%.4f");
+					editedValueInWidget |= ImGui::SliderFloat("##edit", &vectorValue[currentToEditValue], vectorValueParam.getMin()[0], vectorValueParam.getMax()[0], "%.4f");
 					
 					// Add fine adjustment input for precise values
 					float step = (vectorValueParam.getMax()[0] - vectorValueParam.getMin()[0]) * 0.001f;
-					ImGui::InputFloat("Fine Adjust", &vectorValue[currentToEditValue], step, step * 10.0f, "%.6f");
-					
+					editedValueInWidget |= ImGui::InputFloat("Fine Adjust", &vectorValue[currentToEditValue], step, step * 10.0f, "%.6f");
+
 					// Add a note about the Alt key for fine adjustment
 					ImGui::TextDisabled("(Alt+drag for fine adjustment)");
 					
@@ -196,7 +199,11 @@ public:
 					ImGui::EndPopup();
 				}
 			}
-			
+			if(editedValueInWidget){
+				userEditedValue = vectorValue;
+				valueWasUserEdited = true;
+			}
+
 		});
 		
 		vectorValue.resize(size, 0);
@@ -206,19 +213,25 @@ public:
 		listeners.push(size.newListener([this](int &s){
 			if(size>=2)
 			{
+				const auto previousValue = vectorValue;
 				vectorValue.resize(size);
+				if(vectorValue != previousValue) valueWasUserEdited = false;
 				vectorValueParam = vectorValue;
 			}
 		}));
 		
 		listeners.push(minVal.newListener([this](float &f){
+			const auto previousValue = vectorValue;
 			for(auto &v : vectorValue) v = ofClamp(v, minVal, maxVal);
+			if(vectorValue != previousValue) valueWasUserEdited = false;
 			vectorValueParam.setMin(vector<float>(1, f));
 			vectorValueParam = vectorValue;
 		}));
 		
 		listeners.push(maxVal.newListener([this](float &f){
+			const auto previousValue = vectorValue;
 			for(auto &v : vectorValue) v = ofClamp(v, minVal, maxVal);
+			if(vectorValue != previousValue) valueWasUserEdited = false;
 			vectorValueParam.setMax(vector<float>(1, f));
 			vectorValueParam = vectorValue;
 		}));
@@ -232,7 +245,17 @@ public:
 		json["Value"] = vectorValue;
 	};
 
+	bool shouldReviewPresetSaveField(const std::string& field, const ofJson& current) const override {
+		if(field != "Value") return true;
+		return valueWasUserEdited && current == ofJson(userEditedValue);
+	}
+
+	void clearUserEditMarkers() override {
+		valueWasUserEdited = false;
+	}
+
 	void presetRecallAfterSettingParameters(ofJson &json){
+		valueWasUserEdited = false;
 		if(json.count("Value") == 1){
 			vectorValue = json["Value"].get<vector<float>>();
 		}
@@ -250,6 +273,8 @@ private:
 	ofParameter<float> maxVal;
 	ofParameter<float> fineAdjustFactor;
 	vector<float> vectorValue;
+	vector<float> userEditedValue;
+	bool valueWasUserEdited = false;
 	ofParameter<vector<float>> vectorValueParam;
 	customGuiRegion customWidget;
 	
