@@ -13,30 +13,39 @@ delta::delta() : ofxOceanodeNodeModel("Delta"){
     addParameter(invert.set("Invert", false));
     addParameter(input.set("Input", {0}, {0}, {1}));
     addOutputParameter(output.set("Output", {0}, {0}, {1}));
-    addParameter(outputPositive.set("Output +", {0}, {0}, {1}));
-    addParameter(outputNegative.set("Output -", {0}, {0}, {1}));
+    addOutputParameter(outputPositive.set("Output +", {0}, {0}, {1}));
+    addOutputParameter(outputNegative.set("Output -", {0}, {0}, {1}));
     
-    listener = input.newListener(this, &delta::computeOutput);
     color = ofColor::green;
 }
 
-void delta::computeOutput(vector<float> &in){
-    if(inputStore.size() != in.size()){
-        inputStore = in;
-    }
-    else{
-        vector<float> tempOut(in.size());
-        vector<float> tempOutP(in.size());
-        vector<float> tempOutN((in.size()));
-        for(int i = 0; i < in.size(); i++){
-            tempOutP[i] = ofClamp((in[i] - inputStore[i])*gain, 0, 1);
-            tempOutN[i] = ofClamp((inputStore[i] - in[i])*gain, 0, 1);
+void delta::update(ofEventArgs &args){
+    // A number of vector nodes update their storage in place, which does not
+    // necessarily emit an ofParameter change event. Delta is temporal by
+    // definition, so sampling once per frame also gives it consistent
+    // behaviour regardless of how the upstream node publishes its values.
+    computeOutput(input.get());
+}
+
+void delta::computeOutput(const vector<float> &in){
+    vector<float> tempOut(in.size(), 0.0f);
+    vector<float> tempOutP(in.size(), 0.0f);
+    vector<float> tempOutN(in.size(), 0.0f);
+
+    if(inputStore.size() == in.size()){
+        const float gainValue = gain.get();
+        for(size_t i = 0; i < in.size(); i++){
+            tempOutP[i] = ofClamp((in[i] - inputStore[i]) * gainValue, 0.0f, 1.0f);
+            tempOutN[i] = ofClamp((inputStore[i] - in[i]) * gainValue, 0.0f, 1.0f);
             tempOut[i] = tempOutP[i] + tempOutN[i];
         }
-        inputStore = in;
-        output = tempOut;
-        outputPositive = tempOutP;
-        outputNegative = tempOutN;
     }
-    
+
+    // Always publish a vector matching the input size. The first sample (and
+    // the first sample after a size change) has no previous value, so its
+    // delta is correctly initialized to zero instead of leaving stale outputs.
+    inputStore = in;
+    output = tempOut;
+    outputPositive = tempOutP;
+    outputNegative = tempOutN;
 }

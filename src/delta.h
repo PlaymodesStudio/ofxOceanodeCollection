@@ -15,10 +15,10 @@ class delta : public ofxOceanodeNodeModel{
 public:
     delta();
     ~delta(){};
+    void update(ofEventArgs &args) override;
     
 private:
-    void computeOutput(vector<float> &in);
-    ofEventListener listener;
+    void computeOutput(const vector<float> &in);
     
     ofParameter<float>  gain;
     ofParameter<bool>   invert;
