@@ -38,7 +38,6 @@
 #include "vectorRotator.h"
 #include "slotEaser.h"
 #include "valueModifier.h"
-#include "textureEaser.h"
 #include "histogram.h"
 
 
@@ -75,9 +74,8 @@ static void registerModels(ofxOceanode &o){
     o.registerModel<vectorRotator>("Collection");
     o.registerModel<slotEaser>("Collection");
     o.registerModel<valueModifier>("Collection");
-    o.registerModel<textureEaser>("Collection");
     o.registerModel<histogram>("Collection");
-}
+	}
 }
 
 
