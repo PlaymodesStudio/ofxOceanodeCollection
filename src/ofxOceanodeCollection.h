@@ -39,6 +39,7 @@
 #include "slotEaser.h"
 #include "valueModifier.h"
 #include "histogram.h"
+#include "modTime.h"
 
 
 #include "ofxOceanode.h"
@@ -75,6 +76,7 @@ static void registerModels(ofxOceanode &o){
     o.registerModel<slotEaser>("Collection");
     o.registerModel<valueModifier>("Collection");
     o.registerModel<histogram>("Collection");
+	o.registerModel<modTime>("Collection");
 	}
 }
 
