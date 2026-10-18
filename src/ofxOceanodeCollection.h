@@ -46,37 +46,37 @@
 
 namespace ofxOceanodeCollection{
 static void registerModels(ofxOceanode &o){
-    o.registerProcessingModel<delta>("Collection");
-    o.registerProcessingModel<dummySliders>("Collection");
-    o.registerProcessingModel<dummySlidersDynamic>("Collection");
-    o.registerProcessingModel<envelopeGenerator>("Collection");
-    o.registerProcessingModel<euclideanGenerator>("Collection");
-    o.registerProcessingModel<manualOscillatorBank>("Collection");
-    o.registerProcessingModel<sequentialAnalyzer>("Collection");
-    o.registerProcessingModel<stepSequencer>("Collection");
-    o.registerProcessingModel<subDimensionCombinator>("Collection");
-    o.registerProcessingModel<threshold>("Collection");
-    o.registerProcessingModel<valueEaser>("Collection");
-    o.registerProcessingModel<vectorChain>("Collection");
-    o.registerProcessingModel<vectorGetter>("Collection");
-    o.registerProcessingModel<vectorItemOperations>("Collection");
-    o.registerProcessingModel<vectorModulator>("Collection");
-    o.registerProcessingModel<vectorOperations>("Collection");
-    o.registerProcessingModel<vectorPresetEaser>("Collection");
-    o.registerProcessingModel<manualVector>("Collection");
-    o.registerProcessingModel<chance>("Collection");
-    o.registerProcessingModel<markovChain>("Collection");
-	o.registerProcessingModel<transformations>("Collection");
-	o.registerProcessingModel<statistics>("Collection");
-	o.registerProcessingModel<vectorResize>("Collection");
-    o.registerProcessingModel<vectorSelector>("Collection");
-    o.registerProcessingModel<vectorReorder>("Collection");
-    o.registerProcessingModel<vectorDistributor>("Collection");
-    o.registerProcessingModel<vectorRotator>("Collection");
-    o.registerProcessingModel<slotEaser>("Collection");
-    o.registerProcessingModel<valueModifier>("Collection");
-    o.registerProcessingModel<histogram>("Collection");
-	o.registerProcessingModel<modTime>("Collection");
+    o.registerModel<delta>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<dummySliders>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<dummySlidersDynamic>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<envelopeGenerator>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<euclideanGenerator>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<manualOscillatorBank>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<sequentialAnalyzer>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<stepSequencer>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<subDimensionCombinator>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<threshold>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<valueEaser>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<vectorChain>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<vectorGetter>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<vectorItemOperations>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<vectorModulator>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<vectorOperations>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<vectorPresetEaser>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<manualVector>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<chance>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<markovChain>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+	o.registerModel<transformations>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+	o.registerModel<statistics>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+	o.registerModel<vectorResize>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<vectorSelector>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<vectorReorder>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<vectorDistributor>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<vectorRotator>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<slotEaser>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<valueModifier>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+    o.registerModel<histogram>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
+	o.registerModel<modTime>("Collection", ofxOceanodeNodeRegistrationFlags::CanRemoveWhenUnused);
 	}
 }
 
