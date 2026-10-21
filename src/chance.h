@@ -10,11 +10,7 @@
 #define chance_h
 
 #include "ofxOceanodeNodeModel.h"
-// Transport mode needs ofxOceanode's global transport (feature-globalTransport branch).
-// Without it the node compiles exactly as before.
-#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
 #include "ofxOceanodeDeterministicRandom.h"
-#endif
 #include <random>
 #include <cfloat>
 
@@ -36,12 +32,10 @@ public:
 		setSeed();
 		
 		listeners.push(phaseIn.newListener([this](vector<float> &vf){
-#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
 			if(syncToTransport){
 				computeTransport();
 				return;
 			}
-#endif
 			vector<float> tempOut(output);
 			if(oldPhasor.size() != vf.size()){
 				//Resize everything
@@ -86,12 +80,9 @@ public:
 		
 		listeners.push(seed.newListener([this](vector<int> &i){
 			setSeed();
-#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
 			if(syncToTransport) computeTransport();
-#endif
 		}));
 		
-#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
 		// ---- Sync To Transport ----
 		// Output is a pure function of (Seed, Step, Prob): the roll for each cycle comes from
 		// a hash of the step instead of an RNG sequence, so scrubbing the timeline gives the
@@ -107,27 +98,21 @@ public:
 			// With a connected Phase, compute when the phase arrives (the Phasor sends Cycle first).
 			if(syncToTransport && !getOceanodeParameter(phaseIn).hasInConnection()) computeTransport();
 		}));
-#endif
 	}
 
 	void resetPhase(){
-#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
 		if(syncToTransport) return; // position comes from the transport
-#endif
 		setSeed();
 	}
 	
-#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
 	void loadBeforeConnections(ofJson &json) override {
 		// Restore the mode before connections so a saved "Step" connection finds its input.
 		deserializeParameter(json, syncToTransport);
 	}
-#endif
 	
 private:
 	
 	// ---- transport mode ----
-#if defined(OFX_OCEANODE_HAS_GLOBAL_TRANSPORT)
 	ofParameter<bool> syncToTransport;
 	ofParameter<vector<float>> stepIn; // only present in Sync To Transport mode
 	uint64_t sessionSalt = 0;
@@ -187,7 +172,6 @@ private:
 		transportPrimed = true;
 		output = tempOut;
 	}
-#endif
 	
 	void setSeed(){
 		for(int i = 0; i < mt.size(); i++){
