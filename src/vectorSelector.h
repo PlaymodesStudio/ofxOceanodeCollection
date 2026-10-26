@@ -17,7 +17,7 @@ public:
         addParameter(input.set("Input", {0}, {-FLT_MAX}, {FLT_MAX}));
         addParameter(selection.set("Selection", {0}, {0}, {1}));
         addParameter(preservePosition.set("Preserve", 0, 0, INT_MAX));
-        addParameter(outputIndexs.set("Indexs", {0}, {0}, {INT_MAX}));
+        addOutputParameter(outputIndexs.set("Indexs", {0}, {0}, {INT_MAX}));
         addOutputParameter(output.set("Output", {0}, {-FLT_MAX}, {FLT_MAX}));
 
         listener = input.newListener(this, &vectorSelector::inputListener);

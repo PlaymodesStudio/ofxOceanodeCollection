@@ -31,7 +31,7 @@ public:
         for(int i = 0; i < numSliders; i++){
             addParameter(sliders[i].set(ofToString(i), {0}, {0}, {1}));
         }
-        addParameter(chain.set("Chain", {0}, {0}, {1}));
+        addOutputParameter(chain.set("Chain", {0}, {0}, {1}));
     }
     
     
